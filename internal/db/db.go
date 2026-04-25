@@ -8,7 +8,7 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-func InitDDB() (*sql.DB, error) {
+func InitDB() (*sql.DB, error) {
 	dbPath := filepath.Join("data", "app.db")
 
 	// 0755：フォルダの権限設定
