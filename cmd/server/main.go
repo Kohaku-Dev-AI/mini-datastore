@@ -6,8 +6,10 @@ import (
 
 	// 自分のプロジェクトのパッケージを読み込む
 	"example.com/mini-datastore/internal/db"
+	"example.com/mini-datastore/internal/middleware"
+
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	echoMiddleware "github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
@@ -22,8 +24,11 @@ func main() {
 	e := echo.New()
 
 	// ミドルウェアの設定（Logger: ログを出す、 Recover: 落ちても復活させる）
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
+	e.Use(echoMiddleware.Logger())
+	e.Use(echoMiddleware.Recover())
+
+	// エンドポイントは全て X-User-Id のチェックを受ける
+	e.Use(middleware.AuthMiddleware)
 
 	// 最初のエンドポイント
 	e.GET("/api/health", func(c echo.Context) error {
