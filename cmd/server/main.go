@@ -6,6 +6,7 @@ import (
 
 	// 自分のプロジェクトのパッケージを読み込む
 	"example.com/mini-datastore/internal/db"
+	"example.com/mini-datastore/internal/handler"
 	"example.com/mini-datastore/internal/middleware"
 
 	"github.com/labstack/echo/v4"
@@ -20,6 +21,9 @@ func main() {
 	}
 	defer database.Close()
 
+	// ハンドラの初期化
+	h := &handler.NoteHandler{DB: database}
+
 	// echoインスタンスの作成
 	e := echo.New()
 
@@ -30,12 +34,18 @@ func main() {
 	// エンドポイントは全て X-User-Id のチェックを受ける
 	e.Use(middleware.AuthMiddleware)
 
-	// 最初のエンドポイント
+	// 生存確認
 	e.GET("/api/health", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{
 			"status": "ok",
 		})
 	})
+
+	// メモの保存（POST）
+	e.POST("/api/notes", h.CreateNote)
+
+	// メモの一覧取得（GET）
+	e.GET("/api/notes", h.GetNotes)
 
 	// サーバー起動
 	log.Println("サーバーをポート8080で起動します...")
