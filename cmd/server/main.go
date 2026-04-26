@@ -47,6 +47,9 @@ func main() {
 	// メモの一覧取得（GET）
 	e.GET("/api/notes", h.GetNotes)
 
+	// メモを1件取得
+	e.GET("/api/notes/:id", h.GetNote)
+
 	// サーバー起動
 	log.Println("サーバーをポート8080で起動します...")
 	e.Logger.Fatal(e.Start(":8080"))
