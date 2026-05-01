@@ -31,6 +31,13 @@ func main() {
 	e.Use(echoMiddleware.Logger())
 	e.Use(echoMiddleware.Recover())
 
+	// CORSミドルウェアを追加
+	e.Use(echoMiddleware.CORSWithConfig(echoMiddleware.CORSConfig{
+		AllowOrigins: []string{"http://localhost:5173"},
+		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodOptions},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, "X-User-Id"},
+	}))
+
 	// エンドポイントは全て X-User-Id のチェックを受ける
 	e.Use(middleware.AuthMiddleware)
 

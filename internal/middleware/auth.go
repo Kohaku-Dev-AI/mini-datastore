@@ -9,6 +9,10 @@ import (
 // AuthMiddleware は HTTPヘッダーに "X-User-Id" があるかチェックする門番
 func AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		if c.Request().Method == http.MethodOptions {
+			return next(c)
+		}
+
 		// リクエストヘッダーから "X-User-Id" を取り出す
 		userID := c.Request().Header.Get("X-User-Id")
 		if userID == "" {

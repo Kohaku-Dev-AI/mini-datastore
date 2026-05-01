@@ -59,7 +59,7 @@ func (h *NoteHandler) GetNotes(c echo.Context) error {
 	defer rows.Close()
 
 	// 結果をスライスに詰め込む
-	var notes []model.Note
+	notes := make([]model.Note, 0)
 	for rows.Next() {
 		var n model.Note
 		if err := rows.Scan(&n.ID, &n.UserID, &n.Title, &n.Body, &n.CreatedAt); err != nil {
@@ -71,13 +71,15 @@ func (h *NoteHandler) GetNotes(c echo.Context) error {
 }
 
 func (h *NoteHandler) GetNote(c echo.Context) error {
-	// URLの末尾にあるID（/api/notes/:id)を取得
 	id := c.Param("id")
 	userID := c.Request().Header.Get("X-User-Id")
 
 	var note model.Note
-	// 1件だけ取得するので、QueryRowを使う。他人のメモは見れないように user_id も条件に入れる
-	err := h.DB.QueryRow("SELECT id, user_id, title, body FROM notes WHERE id = ? AND user_id = ?", id, userID).Scan(&note.ID, &note.UserID, &note.Title, &note.Body)
+	err := h.DB.QueryRow(
+		"SELECT id, user_id, title, body FROM notes WHERE id = ? AND user_id = ?",
+		id, userID,
+	).Scan(&note.ID, &note.UserID, &note.Title, &note.Body)
+
 	if err == sql.ErrNoRows {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "指定されたメモは見つかりません"})
 	} else if err != nil {
