@@ -34,7 +34,7 @@ func main() {
 	// CORSミドルウェアを追加
 	e.Use(echoMiddleware.CORSWithConfig(echoMiddleware.CORSConfig{
 		AllowOrigins: []string{"http://localhost:5173"},
-		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodOptions},
+		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodOptions, http.MethodDelete, http.MethodPut},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, "X-User-Id"},
 	}))
 
@@ -56,6 +56,12 @@ func main() {
 
 	// メモを1件取得
 	e.GET("/api/notes/:id", h.GetNote)
+
+	// メモを1件削除
+	e.DELETE("/api/notes/:id", h.DeleteNote)
+
+	// メモを1件更新
+	e.PUT("/api/notes/:id", h.UpdateNote)
 
 	// サーバー起動
 	log.Println("サーバーをポート8080で起動します...")
